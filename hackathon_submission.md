@@ -87,9 +87,15 @@ Vultr Cloud (VM with Node.js + Playwright + ffmpeg, Cloudflare Tunnel for HTTPS)
 
 ### For Judges
 
-**Live & Deployed:** DemoPilot is fully deployed on Vultr Cloud and accessible via the URLs above. The HTTPS endpoint has a valid SSL certificate, supports microphone access (for voice-to-script), and requires no setup. Just open the link and start creating demos.
+**Try It Yourself:** DemoPilot is live and fully functional at **https://representative-celebrity-locator-greene.trycloudflare.com** (HTTPS with valid SSL) or **http://45.76.17.96** (stable HTTP). The instance is pre-loaded with $5 of Gemini API credits, so it will work out of the box — no setup, no keys, no installation. Just open the link, paste any public web app URL, and click "Generate Script with AI." The entire pipeline runs in ~60 seconds and delivers a downloadable MP4.
 
-**Proof of Output:** Both showcase demos on our landing page — AgentShield (5:15 min, AI security dashboard) and Meridian (3:33 min, LC intelligence platform) — were generated entirely by DemoPilot. URL to finished MP4, zero human editing. These are not mockups.
+**Deployed on Vultr:** The entire backend — Node.js, Playwright (headless Chromium), ffmpeg, and edge-tts — runs on a Vultr Cloud VM. Vultr is our central infrastructure: it hosts the API server, executes the browser recording pipeline, stores generated videos, and serves the frontend. Cloudflare Tunnel provides the HTTPS layer on top.
+
+**Proof of Output:** Three demo videos in the `demos/` directory and playable on our landing page were generated entirely by DemoPilot — URL to finished MP4, zero human editing:
+- **AgentShield** (5:15 min) — AI security dashboard walkthrough
+- **Meridian** (3:33 min) — LC intelligence platform, workflow & analytics
+- **Cognee** — Knowledge graph platform walkthrough
+These are real outputs from real web apps, not mockups.
 
 **How to Test:**
 1. Open the HTTPS URL above
