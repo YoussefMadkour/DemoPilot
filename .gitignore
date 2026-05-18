@@ -4,6 +4,7 @@ output/
 *.mp4
 *.mp3
 *.webm
+!demos/*.mp4
 .env
 backend/output/
 .DS_Store

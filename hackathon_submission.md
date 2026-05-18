@@ -43,7 +43,7 @@ DemoPilot is a fully autonomous AI agent that generates production-ready demo vi
 
 ### Impact
 
-DemoPilot reduces demo video production from hours to ~60 seconds. It's built for hackathon teams, SaaS companies, and developer advocates who need professional demos without professional video editors. Both showcase videos on our landing page (AgentShield & Meridian) were generated entirely by DemoPilot — from URL to finished MP4, untouched by human hands.
+DemoPilot reduces demo video production from hours to ~60 seconds. It's built for hackathon teams, SaaS companies, and developer advocates who need professional demos without professional video editors. Three exported demos (AgentShield, Meridian, Cognee) in the `demos/` directory were generated entirely by DemoPilot — from URL to finished MP4, untouched by human hands. The live instance is deployed on Vultr with $5 of Gemini credits pre-loaded — try it yourself at http://45.76.17.96.
 
 ## Participation Mode
 Online
@@ -59,3 +59,60 @@ Online
 - Playwright
 - edge-tts
 - ffmpeg
+
+---
+
+## Cover Image
+- Use `docs/01_landing_hero.png` or a 16:9 screenshot of the landing page
+- Alternative: `docs/architecture.png` for a technical cover
+
+## Video Presentation (max 5 min, under 300MB)
+- Record a walkthrough of DemoPilot generating a demo video live
+- Suggested flow: Landing page → Paste URL → Generate script → Edit → Render → Download MP4
+- Existing showcase videos can supplement: `agentshield_demo.mp4` (5:15), `meridian_demo_final.mp4` (3:33)
+
+## GitHub Repository
+https://github.com/YoussefMadkour/DemoPilot
+
+## Demo Application Platform
+Vultr Cloud (VM with Node.js + Playwright + ffmpeg, Cloudflare Tunnel for HTTPS)
+
+## Demo Application URL
+- **HTTPS (recommended):** https://representative-celebrity-locator-greene.trycloudflare.com
+- **HTTP (stable):** http://45.76.17.96
+- Note: HTTPS URL changes on server restart (free Cloudflare tunnel). To get current URL:
+  `ssh root@45.76.17.96 'journalctl -u cloudflared --no-pager -n 20 | grep trycloudflare'`
+
+## Additional Information
+
+### For Judges
+
+**Live & Deployed:** DemoPilot is fully deployed on Vultr Cloud and accessible via the URLs above. The HTTPS endpoint has a valid SSL certificate, supports microphone access (for voice-to-script), and requires no setup. Just open the link and start creating demos.
+
+**Proof of Output:** Both showcase demos on our landing page — AgentShield (5:15 min, AI security dashboard) and Meridian (3:33 min, LC intelligence platform) — were generated entirely by DemoPilot. URL to finished MP4, zero human editing. These are not mockups.
+
+**How to Test:**
+1. Open the HTTPS URL above
+2. Click "Start Creating"
+3. Paste any public web app URL (e.g., https://news.ycombinator.com)
+4. Click "Generate Script with AI" — Gemini analyzes the page in ~10 seconds
+5. Review/edit the script, pick a narrator voice
+6. Click "Generate Demo Video" — takes ~60 seconds
+7. Download your MP4
+
+**Scalability Beyond Hackathon:**
+- **CI/CD integration:** Deterministic output (same script = same video) means DemoPilot can auto-regenerate demo videos on every product release as a pipeline step
+- **SaaS model:** Every software company needs demo videos for sales, onboarding, and marketing — this replaces a $500+/video manual process
+- **API-first architecture:** The backend exposes a clean REST API that can be consumed by any client, CLI, or automation tool
+- **Multi-tenant ready:** Job queue and output isolation are already built in
+
+**Known Limitations:**
+- HTTPS URL changes on server restart (free Cloudflare tunnel tier) — stable HTTP fallback always available
+- Complex SPAs with heavy client-side rendering may require additional wait times in the script
+- Voice-to-script requires microphone permissions (works on HTTPS, not HTTP)
+
+**Technology Highlights:**
+- 80+ cookie consent selectors auto-dismiss banners (OneTrust, Ketch, Cookiebot, etc.) before recording
+- Gold highlight glows on clicks, smooth quadratic scrolling, character-by-character typing for natural demo feel
+- AI QA: Gemini vision extracts 6 frames from the output video and scores quality 1-10
+- 10+ Microsoft Azure Neural voices via edge-tts (free, no API key required)
