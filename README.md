@@ -45,6 +45,7 @@ After rendering, Gemini extracts frames from the output video and reviews them f
 | Video Composition | **ffmpeg** | H.264 MP4 rendering with audio sync |
 | Backend | **Node.js + Express + TypeScript** | API server, pipeline orchestration |
 | Frontend | **React + Vite + TypeScript** | Step-wizard UI with voice recording |
+| Deployment | **Vultr** | Cloud VM with headless Chromium + ffmpeg |
 
 ## Live Demo
 
