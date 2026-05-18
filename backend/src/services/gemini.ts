@@ -174,7 +174,7 @@ export async function generateScript(
   screenshotBase64?: string,
   pageInfo?: string
 ): Promise<DemoScript> {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
 
   const parts: any[] = [{ text: SCRIPT_GENERATION_PROMPT }];
 
@@ -210,7 +210,7 @@ export async function voiceToScript(
   screenshotBase64?: string,
   pageInfo?: string
 ): Promise<DemoScript> {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
 
   const parts: any[] = [
     { text: SCRIPT_GENERATION_PROMPT },
@@ -236,7 +236,7 @@ export interface VideoQAResult {
 }
 
 export async function reviewVideo(framePaths: string[]): Promise<VideoQAResult> {
-  const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+  const model = genAI.getGenerativeModel({ model: "gemini-3-flash" });
 
   const parts: any[] = [{
     text: `Review these frames from a generated demo video. Score 1-10. Respond with JSON: { "score": N, "passed": bool, "summary": "...", "issues": [] }`,

@@ -277,6 +277,8 @@ async function executeAction(page: Page, action: ScriptAction): Promise<void> {
           // Fallback: just wait so the video doesn't stall
           await page.waitForTimeout(1000);
         }
+        // Clicks can navigate to new pages that show fresh consent banners
+        await dismissConsentPopups(page);
       }
       break;
 

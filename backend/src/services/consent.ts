@@ -1,32 +1,21 @@
 import { Page } from "playwright";
 
-// Common cookie consent selectors — covers most CMP providers
+// High-confidence accept selectors — these clearly dismiss consent banners
 const CONSENT_SELECTORS = [
-  // Generic accept buttons
-  'button[id*="accept" i]',
-  'button[class*="accept" i]',
-  'a[id*="accept" i]',
-  '[data-testid*="accept" i]',
-  '[aria-label*="accept" i]',
-
-  // "I agree" / "Got it" / "OK" buttons
-  'button[id*="agree" i]',
-  'button[class*="agree" i]',
-  'button[id*="consent" i]',
-  'button[class*="consent" i]',
-
-  // Common CMP providers
+  // ── Provider-specific (most reliable) ──
   '#onetrust-accept-btn-handler',                    // OneTrust
-  '#onetrust-pc-btn-handler',                        // OneTrust "Accept All" in preferences
-  '.onetrust-close-btn-handler',
   '#accept-recommended-btn-handler',                 // OneTrust recommended
-  'button.save-preference-btn-handler',              // OneTrust save
-  '#ketch-banner-button-primary',                    // Ketch (used by Vultr)
-  '[class*="ketch"] button',                         // Ketch generic
-  'button[data-testid="ketch-banner-accept"]',
   '#CybotCookiebotDialogBodyLevelButtonLevelOptinAllowAll', // Cookiebot
   '#CybotCookiebotDialogBodyButtonAccept',
+  '#ketch-banner-button-primary',                    // Ketch (used by Vultr)
+  'button[data-testid="ketch-banner-accept"]',
   '[data-cky-tag="accept-button"]',                  // CookieYes
+  '#truste-consent-button',                          // TrustArc
+  '.trustarc-agree-btn',
+  '.qc-cmp2-summary-buttons button[mode="primary"]', // Quantcast Choice
+  '#didomi-notice-agree-button',                     // Didomi
+  '.cmplz-btn.cmplz-accept',                         // Complianz
+  '#moove_gdpr_cookie_modal .moove-gdpr-infobar-allow-all', // GDPR Cookie Compliance
   '.cc-accept-all',                                  // Cookie Consent (Osano)
   '.cc-btn.cc-dismiss',
   '#cookie-accept',
@@ -38,7 +27,19 @@ const CONSENT_SELECTORS = [
   '.accept-cookies',
   '#cookieAcceptAll',
 
-  // Broader text-matching fallbacks
+  // ── Generic attribute-based ──
+  'button[id*="accept" i]',
+  'button[class*="accept" i]',
+  'a[id*="accept" i]',
+  '[data-testid*="accept" i]',
+  '[aria-label*="accept" i]',
+  'button[id*="agree" i]',
+  'button[class*="agree" i]',
+
+  // ── Ketch generic ──
+  '[class*="ketch"] button',
+
+  // ── Text-matching (Playwright :has-text) ──
   'button:has-text("Accept All")',
   'button:has-text("Accept all")',
   'button:has-text("Accept Cookies")',
@@ -55,22 +56,24 @@ const CONSENT_SELECTORS = [
   'a:has-text("Accept All")',
   'a:has-text("Accept Cookies")',
   'a:has-text("I Agree")',
-  'button:has-text("Reject All")',       // sometimes "Reject All" is the dismiss button
-  'button:has-text("Decline")',
+
+  // ── Low-confidence dismiss fallbacks (close/dismiss only, NOT reject/decline) ──
   'button:has-text("Close")',
   'button:has-text("Dismiss")',
-  'button:has-text("Continue")',
   '[class*="privacy"] button',
-  '[class*="ketch"] button',
 ];
 
-// Common overlay/banner selectors to hide if clicking fails
+// Selectors for the banner container itself — used to force-hide if clicking fails
 const BANNER_SELECTORS = [
   '#onetrust-banner-sdk',
   '#onetrust-consent-sdk',
   '#CybotCookiebotDialog',
+  '#truste-consent-track',
+  '.qc-cmp2-container',
+  '#didomi-host',
   '[id*="ketch"]',
   '[class*="ketch"]',
+  '.cmplz-cookiebanner',
   '.cookie-banner',
   '.cookie-consent',
   '#cookie-notice',
@@ -88,10 +91,9 @@ export async function dismissConsentPopups(page: Page): Promise<boolean> {
   for (const selector of CONSENT_SELECTORS) {
     try {
       const el = page.locator(selector).first();
-      if (await el.isVisible({ timeout: 300 })) {
+      if (await el.isVisible({ timeout: 600 })) {
         await el.click({ timeout: 2000 });
         dismissed = true;
-        // Wait briefly for banner to close
         await page.waitForTimeout(500);
         break;
       }
@@ -118,16 +120,20 @@ export async function dismissConsentPopups(page: Page): Promise<boolean> {
     }
   }
 
-  // Remove any remaining overlays that block interaction
+  // Remove any remaining overlays that block interaction (use computed style, not inline)
   await page.evaluate(() => {
-    const overlays = document.querySelectorAll('[class*="overlay"], [class*="modal-backdrop"]');
+    const overlays = document.querySelectorAll('[class*="overlay"], [class*="modal-backdrop"], [class*="consent"], [class*="cookie"]');
     overlays.forEach((el) => {
-      if (el instanceof HTMLElement && el.style.zIndex && parseInt(el.style.zIndex) > 999) {
-        el.style.display = "none";
+      if (el instanceof HTMLElement) {
+        const z = parseInt(window.getComputedStyle(el).zIndex);
+        if (z > 999) {
+          el.style.display = "none";
+        }
       }
     });
     // Reset body overflow in case it was locked
     document.body.style.overflow = "auto";
+    document.documentElement.style.overflow = "auto";
   }).catch(() => {});
 
   return dismissed;

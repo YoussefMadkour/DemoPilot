@@ -19,7 +19,7 @@ URL → Gemini Analyzes Page → Playwright Records Browser → edge-tts Narrate
 ### 5-Step Autonomous Pipeline
 
 1. **Capture** — Playwright navigates to the target URL, captures a screenshot, and extracts the page structure (nav links, buttons, headings, form fields)
-2. **Script** — Gemini 2.5 Flash analyzes the screenshot + page elements and writes a narrated demo script with precise browser actions (click, hover, type, scroll, navigate) using real CSS selectors
+2. **Script** — Gemini 3 Flash analyzes the screenshot + page elements and writes a narrated demo script with precise browser actions (click, hover, type, scroll, navigate) using real CSS selectors
 3. **Record** — Playwright drives headless Chromium at 1920×1080 with retina quality, gold highlight glows on clicks, smooth scrolling, visible cursor tracking, and character-by-character typing
 4. **Narrate** — edge-tts generates neural voiceover (Microsoft Azure voices, 10+ options) timed to each segment
 5. **Compose** — ffmpeg merges recording + narration into a final H.264 MP4
@@ -36,7 +36,7 @@ After rendering, Gemini extracts frames from the output video and reviews them f
 
 | Layer | Technology | Role |
 |-------|-----------|------|
-| Script Intelligence | **Google Gemini 2.5 Flash** | Screenshot analysis, script generation, video QA |
+| Script Intelligence | **Google Gemini 3 Flash** | Screenshot analysis, script generation, video QA |
 | Voice Transcription | **Speechmatics** | Real-time voice-to-text for voice-driven scripting |
 | Browser Automation | **Playwright** | Headless Chrome recording at 1920×1080 with retina |
 | Text-to-Speech | **edge-tts** | Microsoft Azure Neural voices (10+ options) |

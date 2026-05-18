@@ -18,7 +18,7 @@ DemoPilot is a fully autonomous AI agent that generates production-ready demo vi
 
 **5-Step Pipeline:**
 1. **Capture** — Playwright navigates to the target URL and captures a screenshot + full page structure (nav links, buttons, headings, form fields)
-2. **Script** — Gemini 2.5 Flash analyzes the screenshot and page elements, then writes a narrated demo script with precise browser actions (click, type, scroll, navigate, hover) using real CSS selectors
+2. **Script** — Gemini 3 Flash analyzes the screenshot and page elements, then writes a narrated demo script with precise browser actions (click, type, scroll, navigate, hover) using real CSS selectors
 3. **Record** — Playwright drives a headless Chromium browser through the scripted actions at 1920x1080, with gold highlight glows on clicks, smooth scrolling, and character-by-character typing for a natural feel
 4. **Narrate** — edge-tts generates neural voiceover (Microsoft Azure voices, 10+ options) perfectly timed to each segment
 5. **Compose** — ffmpeg merges the recording + narration into a final H.264 MP4
@@ -32,7 +32,7 @@ DemoPilot is a fully autonomous AI agent that generates production-ready demo vi
 
 ### Technology
 
-- **Google Gemini 2.5 Flash** — Script intelligence, screenshot analysis, video QA
+- **Google Gemini 3 Flash** — Script intelligence, screenshot analysis, video QA
 - **Vultr** — Cloud deployment (headless Chromium + ffmpeg)
 - **Speechmatics** — Voice-to-text transcription
 - **Playwright** — Browser automation + video recording
