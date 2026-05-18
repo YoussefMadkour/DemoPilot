@@ -9,3 +9,4 @@ backend/output/
 .DS_Store
 *.png
 *.pptx
+.vercel

@@ -650,12 +650,6 @@ const backBtnStyle: React.CSSProperties = {
   cursor: "pointer",
 };
 
-const logoStyle: React.CSSProperties = {
-  width: 28, height: 28, borderRadius: 7,
-  background: "linear-gradient(135deg, var(--accent), var(--cyan))",
-  display: "flex", alignItems: "center", justifyContent: "center",
-  fontFamily: "var(--font-mono)", fontWeight: 800, fontSize: 10, color: "#fff",
-};
 
 const stepperStyle: React.CSSProperties = {
   display: "flex", alignItems: "center", gap: 0,

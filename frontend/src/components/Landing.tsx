@@ -418,12 +418,6 @@ const navInnerStyle: React.CSSProperties = {
   display: "flex", justifyContent: "space-between", alignItems: "center",
 };
 
-const logoMarkStyle: React.CSSProperties = {
-  width: 32, height: 32, borderRadius: 8,
-  background: "linear-gradient(135deg, var(--accent) 0%, var(--cyan) 100%)",
-  display: "flex", alignItems: "center", justifyContent: "center",
-  fontFamily: "var(--font-mono)", fontWeight: 800, fontSize: 12, color: "#fff",
-};
 
 const navCTAStyle: React.CSSProperties = {
   padding: "7px 18px", borderRadius: "var(--radius-sm)",
