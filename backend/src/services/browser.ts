@@ -168,59 +168,91 @@ async function showClickRipple(page: Page, x: number, y: number): Promise<void> 
 // Injects inline CSS glow on element for 800ms, then clicks
 async function highlightAndClick(page: Page, selector: string): Promise<boolean> {
   try {
-    const el = page.locator(selector).first();
-    await el.waitFor({ state: "visible", timeout: 5000 });
+    // Try Playwright locator first
+    let el = page.locator(selector).first();
+
+    // If selector uses :has-text(), also try getByText as fallback
+    const textMatch = selector.match(/:has-text\(["'](.+?)["']\)/);
+
+    try {
+      await el.waitFor({ state: "visible", timeout: 3000 });
+    } catch {
+      // Selector didn't match — try text-based fallback
+      if (textMatch) {
+        const linkText = textMatch[1];
+        console.log(`  Selector "${selector}" not found, trying getByRole("link", { name: "${linkText}" })`);
+        el = page.getByRole("link", { name: linkText }).first();
+        try {
+          await el.waitFor({ state: "visible", timeout: 3000 });
+        } catch {
+          el = page.getByText(linkText, { exact: false }).first();
+          await el.waitFor({ state: "visible", timeout: 2000 });
+        }
+      } else {
+        throw new Error(`Selector not visible: ${selector}`);
+      }
+    }
 
     // Move cursor to element
     const box = await el.boundingBox();
     if (box) {
-      const cx = box.x + box.width / 2;
-      const cy = box.y + box.height / 2;
-      await moveCursorTo(page, cx, cy);
+      await moveCursorTo(page, box.x + box.width / 2, box.y + box.height / 2);
       await page.waitForTimeout(300);
     }
 
-    // Inject gold highlight glow
+    // Scroll element into view first
+    await el.scrollIntoViewIfNeeded({ timeout: 2000 }).catch(() => {});
+    await page.waitForTimeout(300);
+
+    // Gold highlight glow
     await el.evaluate((node) => {
-      const prev = {
-        boxShadow: (node as HTMLElement).style.boxShadow,
-        transform: (node as HTMLElement).style.transform,
-        transition: (node as HTMLElement).style.transition,
-      };
       (node as HTMLElement).style.transition = "all 0.3s ease";
       (node as HTMLElement).style.boxShadow = "0 0 0 4px rgba(212,168,83,0.6), 0 0 20px rgba(212,168,83,0.3)";
       (node as HTMLElement).style.transform = "scale(1.02)";
       setTimeout(() => {
-        (node as HTMLElement).style.boxShadow = prev.boxShadow;
-        (node as HTMLElement).style.transform = prev.transform;
-        (node as HTMLElement).style.transition = prev.transition;
+        (node as HTMLElement).style.boxShadow = "";
+        (node as HTMLElement).style.transform = "";
+        (node as HTMLElement).style.transition = "";
       }, 600);
     });
 
     await page.waitForTimeout(600);
 
-    // Show click ripple
     if (box) {
       await showClickRipple(page, box.x + box.width / 2, box.y + box.height / 2);
     }
 
-    await el.click({ timeout: 3000 });
-    await page.waitForTimeout(1000);
+    try {
+      await el.click({ timeout: 3000 });
+    } catch {
+      // Force click as fallback (bypasses visibility/overlay checks)
+      await el.click({ force: true, timeout: 3000 });
+    }
+    console.log(`  Clicked: ${selector}`);
+    await page.waitForTimeout(2000); // wait for navigation/page load
     return true;
-  } catch {
+  } catch (err: any) {
+    console.warn(`  Click FAILED: ${selector} — ${err.message?.slice(0, 80)}`);
     return false;
   }
 }
 
-// ─── Smooth scroll using native browser smooth scrolling ───
-async function smoothScroll(page: Page, distance: number): Promise<void> {
-  await page.evaluate((d) => window.scrollBy({ top: d, behavior: "smooth" }), distance);
-  // Wait for the scroll animation to finish (browser handles easing natively)
-  const waitMs = Math.min(Math.abs(distance) * 1.5, 1500);
-  await page.waitForTimeout(waitMs);
+// ─── Smooth scroll using mouse.wheel (Playwright native, visible in video) ───
+async function smoothScroll(page: Page, totalDistance: number): Promise<void> {
+  // Use mouse.wheel for smooth, visible scrolling (per Playwright docs)
+  const steps = 15;
+  const stepSize = totalDistance / steps;
+  for (let i = 0; i < steps; i++) {
+    await page.mouse.wheel(0, stepSize);
+    await page.waitForTimeout(60); // 60ms between wheel events = smooth motion
+  }
+  await page.waitForTimeout(400); // settle
 }
 
 async function executeAction(page: Page, action: ScriptAction): Promise<void> {
+  const detail = action.selector || action.url || action.direction || `${action.duration}ms`;
+  console.log(`  Action: ${action.type} ${detail}`);
+
   switch (action.type) {
     case "navigate":
       if (action.url) {

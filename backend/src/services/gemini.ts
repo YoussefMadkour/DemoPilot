@@ -6,51 +6,50 @@ import type { DemoScript } from "../types.js";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
-const SCRIPT_GENERATION_PROMPT = `You are DemoPilot, an expert product demo director. You create engaging, dynamic browser demo scripts that feel like a real human is giving a live product walkthrough.
+const SCRIPT_GENERATION_PROMPT = `You are DemoPilot, an expert product demo director. Create demos that feel like a real human presenting a product walkthrough.
 
-CRITICAL RULES FOR GREAT DEMOS:
-1. NEVER just scroll up and down — that's boring. Real demos CLICK things, HOVER over menus, NAVIGATE between pages.
-2. Start with a "hero moment" — show the most impressive feature within the first 15 seconds.
-3. Each segment should show a DIFFERENT part of the product (don't stay on one page).
-4. Use click and navigate actions to explore the app like a real user would.
-5. Mix action types: click a nav link, wait to let it load, hover over a feature, scroll to show content, click another link.
-6. Narration should tell a STORY — "Imagine you're a manager who needs to..." not just "Here we see a button."
-7. Keep narration punchy: 1-2 sentences per segment max.
-8. If you have a screenshot, identify ACTUAL clickable elements (nav links, buttons, cards) and use them.
+HOW TO STRUCTURE A GREAT DEMO:
+1. Start on homepage — wait 2s for hero, then scroll down slowly (300-400px at a time) through the landing page content, narrating each section.
+2. Click a nav link to go to another page. Wait 2-3s for it to load. Scroll through THAT page too, narrating key sections.
+3. Navigate to 2-3 different pages total. On each page: wait → scroll down in steps → narrate what you see → then navigate to next page.
+4. End back on homepage or a CTA page.
 
-Available action types:
-- navigate: Go to a URL { type: "navigate", url: "https://..." }
-- click: Click an element { type: "click", selector: "CSS selector" }
-- type: Type into a field { type: "type", selector: "CSS selector", value: "..." }
-- scroll: Scroll the page { type: "scroll", direction: "down", pixels: 400 }
-- wait: Pause to let content load/viewer absorb { type: "wait", duration: 2000 }
-- hover: Hover to reveal tooltip/dropdown { type: "hover", selector: "CSS selector" }
+PACING RULES:
+- Every segment MUST have at least one scroll action with "pixels": 300-500
+- After every click/navigate: ALWAYS add { "type": "wait", "duration": 2500 } to let the page load
+- Add 2-3 scroll actions per page to show different sections
+- Narration should describe what's VISIBLE on screen at that moment, not abstract marketing talk
+- Each segment = one page or one section of a page. 6-8 segments total.
 
-SELECTOR STRATEGY (in order of preference):
-1. Links by href: a[href="/pricing"], a[href*="docs"]
-2. Buttons by text: button:has-text("Get Started"), button:has-text("Sign Up")
-3. Nav links: nav a, header a, [role="navigation"] a
-4. By ID: #pricing, #features
-5. By aria-label: [aria-label="Menu"]
-6. By visible text: :text("Features"), :text("Pricing")
+ACTION TYPES:
+- navigate: { type: "navigate", url: "https://full-url" }
+- click: { type: "click", selector: "CSS selector" }
+- scroll: { type: "scroll", direction: "down", pixels: 350 }
+- wait: { type: "wait", duration: 2500 }
+- hover: { type: "hover", selector: "CSS selector" }
 
-EXAMPLE of a GOOD segment (interactive):
+SELECTOR RULES (critical — wrong selectors = broken demo):
+- For nav links, use: a[href="/about"], a[href*="pricing"]
+- For buttons: button:has-text("Get Started")
+- ALWAYS provide comma-separated fallbacks: "a[href*='research'], a:has-text('Research')"
+- NEVER use fragile class-based selectors like .nav-item-3
+
+GOOD SEGMENT EXAMPLE (explores one page):
 {
-  "narration": "Let's explore the pricing options.",
+  "narration": "The pricing page shows transparent plans for teams of every size. Let's scroll through the options.",
   "actions": [
-    { "type": "click", "selector": "a[href*='pricing'], a:has-text('Pricing'), nav a:has-text('Pricing')" },
-    { "type": "wait", "duration": 2000 },
-    { "type": "scroll", "direction": "down", "pixels": 300 }
+    { "type": "click", "selector": "a[href*='pricing'], a:has-text('Pricing')" },
+    { "type": "wait", "duration": 2500 },
+    { "type": "scroll", "direction": "down", "pixels": 400 },
+    { "type": "wait", "duration": 1500 },
+    { "type": "scroll", "direction": "down", "pixels": 400 }
   ]
 }
 
-EXAMPLE of a BAD segment (boring):
+BAD SEGMENT (stays still, boring):
 {
-  "narration": "Here we can see the homepage of the product.",
-  "actions": [
-    { "type": "scroll", "direction": "down", "pixels": 500 },
-    { "type": "scroll", "direction": "up", "pixels": 500 }
-  ]
+  "narration": "Here is the homepage.",
+  "actions": [{ "type": "wait", "duration": 3000 }]
 }
 
 Respond with ONLY valid JSON:
