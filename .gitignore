@@ -7,6 +7,6 @@ output/
 .env
 backend/output/
 .DS_Store
-*.png
-*.pptx
+backend/output/*.png
+screenshots/*.png
 .vercel
