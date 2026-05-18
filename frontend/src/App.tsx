@@ -361,7 +361,12 @@ function App({ onBack }: AppProps) {
                       <span style={spinner} /> Transcribing via Speechmatics...
                     </div>
                   ) : (
-                    <VoiceRecorder onRecorded={handleVoiceRecorded} disabled={anyLoading || !url.trim()} />
+                    <VoiceRecorder
+                      label="Describe what to demo"
+                      subtitle="CREATES NEW SCRIPT VIA SPEECHMATICS"
+                      onRecorded={handleVoiceRecorded}
+                      disabled={anyLoading || !url.trim()}
+                    />
                   )}
 
                   {voiceTranscript && (
@@ -453,12 +458,13 @@ function App({ onBack }: AppProps) {
                   {/* Voice edit bar */}
                   <div style={{ display: "flex", gap: 8, marginBottom: 16, padding: 12, background: "var(--bg-elevated)", borderRadius: "var(--radius)", border: "1px solid var(--border)" }}>
                     <VoiceRecorder
+                      label="Add more segments with voice"
+                      subtitle="APPENDS TO EXISTING SCRIPT"
                       onRecorded={async (blob) => {
                         setVoiceLoading(true);
                         setError(null);
                         try {
                           const result = await voiceToScript(url.trim(), blob);
-                          // Merge: append new segments to existing ones
                           setSegments((prev) => [...prev, ...result.script.segments]);
                           setVoiceTranscript(result.transcript);
                         } catch (err: any) {

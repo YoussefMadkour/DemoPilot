@@ -3,9 +3,11 @@ import { useState, useRef, useCallback } from "react";
 interface Props {
   onRecorded: (audioBlob: Blob) => void;
   disabled?: boolean;
+  label?: string;
+  subtitle?: string;
 }
 
-export function VoiceRecorder({ onRecorded, disabled }: Props) {
+export function VoiceRecorder({ onRecorded, disabled, label = "Describe with voice", subtitle = "SPEECHMATICS" }: Props) {
   const [recording, setRecording] = useState(false);
   const [duration, setDuration] = useState(0);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
@@ -69,8 +71,8 @@ export function VoiceRecorder({ onRecorded, disabled }: Props) {
         <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
         <line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/>
       </svg>
-      Describe with voice
-      <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--text-tertiary)", marginLeft: 4 }}>SPEECHMATICS</span>
+      {label}
+      <span style={{ fontFamily: "var(--font-mono)", fontSize: 9, color: "var(--text-tertiary)", marginLeft: 4 }}>{subtitle}</span>
     </button>
   );
 }
